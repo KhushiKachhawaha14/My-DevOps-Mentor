@@ -1,0 +1,9 @@
+*.pem
+.env
+debug_log.txt
+error_log.txt
+__pycache__/
+.terraform/
+terraform.tfstate.backup
+terraform.tfstate
+*.exe

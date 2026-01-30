@@ -1,0 +1,7 @@
+flask
+google-genai
+requests
+gunicorn
+mangum
+python-dotenv
+boto3
