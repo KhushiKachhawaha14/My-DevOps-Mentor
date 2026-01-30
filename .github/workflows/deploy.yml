@@ -27,7 +27,7 @@ jobs:
       - name: Build, Tag, and Push Image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: devops-mentor-bot
+          ECR_REPOSITORY: my-devops-mentor
           IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
@@ -37,4 +37,4 @@ jobs:
         run: |
           aws lambda update-function-code \
             --function-name DevOpsMentorBot \
-            --image-uri ${{ steps.login-ecr.outputs.registry }}/devops-mentor-bot:latest
+            --image-uri ${{ steps.login-ecr.outputs.registry }}/my-devops-mentor:latest
