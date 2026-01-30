@@ -1,0 +1,14 @@
+services:
+  mentor-bot:
+    build: .
+    container_name: devops-mentor-local
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env
+    # This override is the secret sauce: 
+    # It tells the container "Don't act like Lambda, act like a local server"
+    command: python bot.py
+    volumes:
+      - .:/var/task
+    restart: always
