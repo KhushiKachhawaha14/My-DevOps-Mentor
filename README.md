@@ -1,51 +1,47 @@
+![Deploy Status](https://github.com/KhushiKachhawaha14/My-DevOps-Mentor/actions/workflows/deploy.yml/badge.svg)
+
 # 🤖 My-DevOps-Mentor
+ > An AI-powered, serverless mentorship bot that turns GitHub activity into actionable DevOps learning missions.
 
-**An AI-powered, event-driven mentorship bot that turns GitHub activity into actionable learning missions.**
-
----
-
-## 🌟 The "Why"
-
-As a fresher DevOps Engineer, I wanted to bridge the gap between "committing code" and "managing infrastructure." This bot acts as a real-time mentor: it monitors my repository, analyzes my actions using AI, and emails me a 15-minute challenge to improve the project's DevOps maturity.
-
+## 🏗️ Architecture & Workflow
+This project evolved from a local Flask prototype into a production-ready, cloud-native application.
+```Plaintext
+[ GitHub Event ] ➔ [ AWS API Gateway ] ➔ [ AWS Lambda (Docker) ] ➔ [ Gemini AI ]
+                                               ▲
+                                               │ (CI/CD Pipeline)
+                                        [ GitHub Actions ] ➔ [ Amazon ECR ]
+```
 ## 🛠️ Tech Stack
-
-- **Backend:** Python & Flask (Web Server)
-- **AI Engine:** Google Gemini 2.0 Flash
-- **Infrastructure:** ngrok (Static Domain Tunneling)
-- **Secret Management:** Python-Dotenv
-- **Security:** HMAC-SHA256 Webhook Signature Verification
+| Component | Technology |
+| :--- | :--- |
+| **Cloud Provider** | AWS (Lambda, API Gateway, ECR) |
+| **AI Engine** | Google Gemini 1.5 Flash |
+| **CI/CD** | GitHub Actions with OIDC Authentication |
+| **Containerization** | Docker |
+| **Security** | IAM Role Federation (Keyless Auth) |
 
 ## ⚡ Engineering Challenges & Solutions
+**1. Zero-Trust Security with OIDC**
+**Problem**: Storing permanent AWS Access Keys in GitHub is a major security risk.
 
-### 1. Handling Webhook Timeouts
+**Solution**: Implemented OpenID Connect (OIDC) to allow GitHub Actions to securely assume a temporary IAM role. This eliminated the need for static secrets.
 
-**Problem:** GitHub expects a response within 10 seconds, but AI processing and email delivery often took longer, especially during API rate limits.
-**Solution:** Implemented **Asynchronous Processing** using Python `threading`. The server now sends an immediate `200 OK` to GitHub while the background thread handles the "heavy lifting."
+**2. Containerized Serverless Deployment**
+**Problem**: Managing Python dependencies in Lambda can be brittle.
 
-### 2. API Resilience
+**Solution**: Packaging the bot as a Docker image and pushing it to Amazon ECR. This ensures the execution environment is identical from dev to prod.
 
-**Problem:** The Gemini API Free Tier frequently hit `429 RESOURCE_EXHAUSTED` errors.
-**Solution:** Developed a **Retry Loop** with exponential backoff. The bot intelligently waits for the quota window to reset without failing the mission delivery.
+**3. Cost Management & Monitoring**
+**Problem**: Unexpected cloud costs can occur in event-driven architectures.
 
-### 3. "Security First" Architecture
+**Solution**: Configured AWS Budgets with automated email alerts at 85% of actual spend to maintain Free Tier compliance.
 
-**Problem:** Hardcoding credentials creates a massive security vulnerability.
-**Solution:** Managed all sensitive data via environment variables (`.env`) and secured the webhook endpoint using cryptographic signature validation.
+## 🚀 Deployment Pipeline
+The project uses a fully automated CI/CD pipeline:
 
-## 🚀 How to Run Locally
+- **Build**: Docker image is built on every push to main.
 
-1. **Clone the repo:** `git clone https://github.com/KhushiKachhawaha14/My-DevOps-Mentor.git`
-2. **Install Dependencies:** `pip install -r requirements.txt`
-3. **Configure Secrets:** Create a `.env` file with your Gemini API Key and Gmail App Password.
-4. **Start the Server:** `python bot.py`
-5. **Tunnel via ngrok:** `ngrok http --url=your-static-domain 5000`
+- **Push**: Image is pushed to Amazon ECR.
 
----
+- **Deploy**: AWS Lambda is updated to pull the latest image immediately.
 
-## 📬 Future Roadmap
-
-- [ ] Migrate from local host to **AWS Lambda (Serverless)** for cost-optimization.
-- [ ] Use **AWS API Gateway** to manage secure webhook endpoints.
-- [ ] Store mission history in **AWS DynamoDB** (NoSQL database).
-- [ ] Implement a **CI/CD pipeline** via GitHub Actions to auto-deploy to Lambda.
