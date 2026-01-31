@@ -54,5 +54,3 @@ The project uses a fully automated CI/CD pipeline:
 - **Push**: Image is pushed to Amazon ECR.
 
 - **Deploy**: AWS Lambda is updated to pull the latest image immediately.
-
----
